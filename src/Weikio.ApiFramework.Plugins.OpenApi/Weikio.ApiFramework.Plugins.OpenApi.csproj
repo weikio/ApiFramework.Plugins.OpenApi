@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <IsPackable>true</IsPackable>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>Weik.io</Authors>
+    <Company>Weik.io</Company>
+    <Description>Open Api plugin for Api Framework.</Description>
+    <PackageDescription>Open Api plugin for Api Framework.</PackageDescription>
+    <PackageProjectUrl>https://www.weikio.com</PackageProjectUrl>
+    <Copyright>©2019 Weik.io</Copyright>
+    <PackageId>Weikio.ApiFramework.Plugins.OpenApi</PackageId>
+    <Product>Weikio.ApiFramework.Plugins.OpenApi</Product>
+    <AssemblyName>Weikio.ApiFramework.Plugins.OpenApi</AssemblyName>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/weikio/ApiFramework.Plugins.OpenApi</RepositoryUrl>
+    <PackageTags>apiframework;plugin;openapi</PackageTags>
+    <PackageIcon>logo_256.png</PackageIcon>
+    <Title>Open Api plugin for Api Framework.</Title>
+    <MinVerMinimumMajorMinor>1.0</MinVerMinimumMajorMinor>    
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="LamarCompiler" Version="2.0.0" />
+    <PackageReference Include="System.Data.Odbc" Version="4.5.0" />
+    <PackageReference Include="MinVer" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="2.2.0" />
+    <PackageReference Include="NSwag.CodeGeneration.CSharp" Version="13.0.5" />    
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="../../docs/logo_256.png" Pack="true" Visible="false" PackagePath="" />
+  </ItemGroup>
+  
+</Project>
