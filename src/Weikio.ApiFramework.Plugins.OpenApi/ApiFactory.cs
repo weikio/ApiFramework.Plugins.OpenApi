@@ -10,9 +10,9 @@ namespace Weikio.ApiFramework.Plugins.OpenApi
 {
     public static class ApiFactory
     {
-        public static Task<IEnumerable<Type>> Create(string endpointRoute, ApiOptions apiOptions)
+        public static async Task<IEnumerable<Type>> Create(string endpointRoute, ApiOptions configuration)
         {
-            var openApiDocument = OpenApiDocument.FromUrlAsync(apiOptions.SpecificationUrl).Result;
+            var openApiDocument = await OpenApiDocument.FromUrlAsync(configuration.SpecificationUrl);
 
             var clientGeneratorSettings = new CSharpClientGeneratorSettings
             {
@@ -21,7 +21,6 @@ namespace Weikio.ApiFramework.Plugins.OpenApi
                 UseHttpClientCreationMethod = true,
                 DisposeHttpClient = false,
                 ClientBaseClass = typeof(OpenApiClientBase).FullName,
-                ConfigurationClass = typeof(ApiOptions).FullName,
                 GenerateOptionalParameters = true,
                 CSharpGeneratorSettings =
                 {
@@ -43,7 +42,7 @@ namespace Weikio.ApiFramework.Plugins.OpenApi
                 .Where(x => !x.IsAbstract && x.Name.EndsWith("Api"))
                 .ToList();
 
-            return Task.FromResult<IEnumerable<Type>>(result);
+            return result;
         }
 
         private static string GetNamespace(string pluginRoute)
