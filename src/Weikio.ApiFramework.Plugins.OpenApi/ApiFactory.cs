@@ -22,6 +22,7 @@ namespace Weikio.ApiFramework.Plugins.OpenApi
                 DisposeHttpClient = false,
                 ClientBaseClass = typeof(OpenApiClientBase).FullName,
                 GenerateOptionalParameters = true,
+                ParameterArrayType = "System.Collections.Generic.List",
                 CSharpGeneratorSettings =
                 {
                     Namespace = GetNamespace(endpointRoute)
