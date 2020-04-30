@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -29,11 +29,15 @@ namespace Weikio.ApiFramework.Plugins.OpenApi
                 }
             };
 
+            var defaultTemplateFactory = clientGeneratorSettings.CSharpGeneratorSettings.TemplateFactory;
+            clientGeneratorSettings.CSharpGeneratorSettings.TemplateFactory = new TemplateFactory(defaultTemplateFactory);
+
             var clientGenerator = new CSharpClientGenerator(openApiDocument, clientGeneratorSettings);
             var clientCode = clientGenerator.GenerateFile();
 
             var assemblyGenerator = new AssemblyGenerator();
             assemblyGenerator.ReferenceAssemblyContainingType<OpenApiClientBase>();
+            assemblyGenerator.ReferenceAssemblyContainingType<Microsoft.AspNetCore.Mvc.Routing.HttpMethodAttribute>();
             assemblyGenerator.ReferenceAssemblyContainingType<System.Net.Http.HttpClient>();
             assemblyGenerator.ReferenceAssemblyContainingType<System.ComponentModel.DataAnnotations.RequiredAttribute>();
             assemblyGenerator.ReferenceAssemblyContainingType<Newtonsoft.Json.JsonConverter>();

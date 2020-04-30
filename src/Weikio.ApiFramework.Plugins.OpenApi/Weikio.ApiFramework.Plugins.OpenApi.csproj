@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -22,13 +22,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+  
+  <ItemGroup>
     <PackageReference Include="LamarCompiler" Version="2.0.0" />
     <PackageReference Include="System.Data.Odbc" Version="4.5.0" />
     <PackageReference Include="MinVer" Version="2.0.0" />
     <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="3.1.0" />
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="3.1.0" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="3.1.0" />
-    <PackageReference Include="NSwag.CodeGeneration.CSharp" Version="13.0.5" />    
+    <PackageReference Include="NSwag.CodeGeneration.CSharp" Version="13.4.2" />    
   </ItemGroup>
 
   <ItemGroup>
