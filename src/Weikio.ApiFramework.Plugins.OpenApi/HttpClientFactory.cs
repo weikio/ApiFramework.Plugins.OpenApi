@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -23,6 +23,12 @@ namespace Weikio.ApiFramework.Plugins.OpenApi
                 }
 
                 var client = new HttpClient();
+
+                if (TimeSpan.TryParse(options.HttpClient?.Timeout, out var timeout))
+                {
+                    client.Timeout = timeout;
+                }
+
                 ConfigureAuthentication(client, options);
 
                 return client;
