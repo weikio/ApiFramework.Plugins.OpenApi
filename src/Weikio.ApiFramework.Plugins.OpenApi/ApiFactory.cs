@@ -12,6 +12,11 @@ namespace Weikio.ApiFramework.Plugins.OpenApi
     {
         public static async Task<IEnumerable<Type>> Create(string endpointRoute, ApiOptions configuration)
         {
+            if (configuration.Mode == ApiMode.Proxy)
+            {
+                return new List<Type>() { typeof(OpenApiClientProxy) };
+            }
+            
             var openApiDocument = await OpenApiDocument.FromUrlAsync(configuration.SpecificationUrl);
 
             var clientGeneratorSettings = new CSharpClientGeneratorSettings
@@ -23,10 +28,7 @@ namespace Weikio.ApiFramework.Plugins.OpenApi
                 ClientBaseClass = typeof(OpenApiClientBase).FullName,
                 GenerateOptionalParameters = true,
                 ParameterArrayType = "System.Collections.Generic.List",
-                CSharpGeneratorSettings =
-                {
-                    Namespace = GetNamespace(endpointRoute)
-                }
+                CSharpGeneratorSettings = { Namespace = GetNamespace(endpointRoute) }
             };
 
             var defaultTemplateFactory = clientGeneratorSettings.CSharpGeneratorSettings.TemplateFactory;

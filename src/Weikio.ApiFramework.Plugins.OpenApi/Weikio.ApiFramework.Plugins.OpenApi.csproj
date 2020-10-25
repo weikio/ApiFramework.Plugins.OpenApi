@@ -29,14 +29,22 @@
     <PackageReference Include="LamarCompiler" Version="2.0.0" />
     <PackageReference Include="System.Data.Odbc" Version="4.5.0" />
     <PackageReference Include="MinVer" Version="2.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="3.1.0" />
-    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="3.1.0" />
-    <PackageReference Include="Microsoft.Extensions.Options" Version="3.1.0" />
-    <PackageReference Include="NSwag.CodeGeneration.CSharp" Version="13.4.2" />    
+    <PackageReference Include="Microsoft.ReverseProxy" Version="1.0.0-preview.6.20513.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.9" />
+    <PackageReference Include="NSwag.Core" Version="13.8.2" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="3.1.2" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="3.1.2" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="3.1.2" />
+    <PackageReference Include="NSwag.CodeGeneration.CSharp" Version="13.8.2" />
   </ItemGroup>
 
   <ItemGroup>
     <None Include="../../docs/logo_256.png" Pack="true" Visible="false" PackagePath="" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\ApiFramework\src\Weikio.ApiFramework.AspNetCore.NSwag\Weikio.ApiFramework.AspNetCore.NSwag.csproj" />
+    <ProjectReference Include="..\..\..\ApiFramework\src\Weikio.ApiFramework.SDK\Weikio.ApiFramework.SDK.csproj" />
   </ItemGroup>
   
 </Project>
