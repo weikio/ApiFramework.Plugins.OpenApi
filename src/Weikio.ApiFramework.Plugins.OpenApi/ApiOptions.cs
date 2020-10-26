@@ -4,7 +4,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.ReverseProxy.Service.Proxy;
-using Microsoft.ReverseProxy.Service.RuntimeModel.Transforms;
+using NSwag;
 
 namespace Weikio.ApiFramework.Plugins.OpenApi
 {
@@ -28,6 +28,13 @@ namespace Weikio.ApiFramework.Plugins.OpenApi
 
         public Func<ApiRequestContext, Task<object>> BeforeRequest = null;
         public Func<ApiRequestContext, object, Dictionary<string, string>> ConfigureAdditionalHeaders = null;
+
+        public Func<string, OpenApiPathItem, ApiOptions, bool> IncludePath { get; set; } = (path, item, options) => true;
+        public Func<string, OpenApiPathItem, ApiOptions, bool> ExcludePath { get; set; } = (path, item, options) => false;
+        public Func<string, OpenApiOperation, ApiOptions, bool> IncludeOperation { get; set; } = (operationId, item, options) => true;
+        public Func<string, OpenApiOperation, ApiOptions, bool> ExcludeOperation { get; set; } = (operationId, item, options) => false;
+        public Func<string, OpenApiPathItem, ApiOptions, (string, OpenApiPathItem)> TransformPath { get; set; } = (path, item, options) => (path, item);
+        public Func<string, OpenApiOperation, ApiOptions, (string, OpenApiOperation)> TransformOperation { get; set; } = (path, item, options) => (path, item);
     }
 
     public enum ApiMode

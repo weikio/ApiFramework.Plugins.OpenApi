@@ -26,19 +26,22 @@ namespace Weikio.ApiFramework.Plugins.OpenApi
         private readonly ILoggerFactory _loggerFactory;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IServiceProvider _serviceProvider;
+        private readonly IEndpointRouteTemplateProvider _endpointRouteTemplateProvider;
 
         public ApiOptions Configuration { get; set; }
 
         public OpenApiClientProxy(ILogger<OpenApiClientProxy> logger, ILoggerFactory loggerFactory, IHttpContextAccessor httpContextAccessor,
-            IServiceProvider serviceProvider)
+            IServiceProvider serviceProvider, IEndpointRouteTemplateProvider endpointRouteTemplateProvider)
         {
             _logger = logger;
             _loggerFactory = loggerFactory;
             _httpContextAccessor = httpContextAccessor;
             _serviceProvider = serviceProvider;
+            _endpointRouteTemplateProvider = endpointRouteTemplateProvider;
         }
 
         [FixedHttpConventions]
+        [ApiExplorerSettings(IgnoreApi = true)]
         [Route("{**catchAll}")]
         [HttpGet]
         [HttpPost]
@@ -60,10 +63,11 @@ namespace Weikio.ApiFramework.Plugins.OpenApi
             }
 
             var route = context.Request.Path.ToString().Replace(catchAll, "").TrimEnd('/');
-            
+
             var serverUrlMetaData = context.GetEndpoint()?.Metadata?.OfType<ServerUrl>().FirstOrDefault();
 
             var endpointUrl = string.Empty;
+
             if (serverUrlMetaData != null)
             {
                 endpointUrl = serverUrlMetaData.Url;
@@ -73,9 +77,9 @@ namespace Weikio.ApiFramework.Plugins.OpenApi
             {
                 endpointUrl = Configuration.ApiUrl;
             }
-            
+
             var additionalHeaders = new Dictionary<string, string>();
-            
+
             if (Configuration?.ConfigureAdditionalHeaders != null)
             {
                 additionalHeaders = Configuration.ConfigureAdditionalHeaders(requestContext, state);
@@ -90,7 +94,7 @@ namespace Weikio.ApiFramework.Plugins.OpenApi
             {
                 headerTransforms.Add(additionalHeader.Key, new RequestHeaderValueTransform(additionalHeader.Value, true));
             }
-            
+
             var proxyOptions = new RequestProxyOptions()
             {
                 RequestTimeout = TimeSpan.FromSeconds(100),
@@ -107,6 +111,7 @@ namespace Weikio.ApiFramework.Plugins.OpenApi
 
             await proxy.ProxyAsync(context, endpointUrl, client, proxyOptions);
         }
+
         private static string _proxyLock = "lock";
         private static IHttpProxy _proxy = null;
 
@@ -170,11 +175,64 @@ namespace Weikio.ApiFramework.Plugins.OpenApi
             var additionalOperationPaths = new Dictionary<string, OpenApiPathItem>();
             var additionalSchemas = new List<KeyValuePair<string, JsonSchema>>();
 
+            var routeTemplate = _endpointRouteTemplateProvider.GetRouteTemplate(endpoint);
+
+            var transformedPaths = new Dictionary<string, OpenApiPathItem>();
+
             foreach (var path in openApiDocument.Paths)
             {
-                additionalOperationPaths.Add(endpoint.Route + path.Key, path.Value);
+                var transformedPath = config.TransformPath(path.Key, path.Value, config);
+                transformedPaths.Add(transformedPath.Item1, transformedPath.Item2);
             }
 
+            foreach (var path in transformedPaths)
+            {
+                var isIncluded = config.IncludePath(path.Key, path.Value, config);
+
+                if (!isIncluded)
+                {
+                    continue;
+                }
+
+                var isExcluded = config.ExcludePath(path.Key, path.Value, config);
+
+                if (isExcluded)
+                {
+                    continue;
+                }
+
+                var includedOperations = new Dictionary<string, OpenApiOperation>();
+
+                foreach (var operationId in path.Value.Keys)
+                {
+                    var operation = path.Value[operationId];
+
+                    var isOperationIncluded = config.IncludeOperation(operationId, operation, config);
+
+                    if (!isOperationIncluded)
+                    {
+                        continue;
+                    }
+
+                    var isOperationExcluded = config.ExcludeOperation(operationId, operation, config);
+
+                    if (isOperationExcluded)
+                    {
+                        continue;
+                    }
+
+                    var transformedOperation = config.TransformOperation(operationId, operation, config);
+
+                    includedOperations.Add(transformedOperation.Item1, transformedOperation.Item2);
+                }
+
+                path.Value.Clear();
+                path.Value.AddRange(includedOperations);
+
+                additionalOperationPaths.Add(routeTemplate + path.Key, path.Value);
+            }
+
+            // TODO: These could be filtered based on the operation/path filterings
             foreach (var openApiSchema in openApiDocument.Components.Schemas)
             {
                 additionalSchemas.Add(openApiSchema);
