@@ -9,7 +9,7 @@
     <Description>Open Api plugin for Api Framework.</Description>
     <PackageDescription>Open Api plugin for Api Framework.</PackageDescription>
     <PackageProjectUrl>https://www.weikio.com</PackageProjectUrl>
-    <Copyright>©2019 Weik.io</Copyright>
+    <Copyright>©2020 Weik.io</Copyright>
     <PackageId>Weikio.ApiFramework.Plugins.OpenApi</PackageId>
     <Product>Weikio.ApiFramework.Plugins.OpenApi</Product>
     <AssemblyName>Weikio.ApiFramework.Plugins.OpenApi</AssemblyName>
@@ -36,15 +36,12 @@
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="3.1.2" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="3.1.2" />
     <PackageReference Include="NSwag.CodeGeneration.CSharp" Version="13.8.2" />
+    <PackageReference Include="Weikio.ApiFramework.AspNetCore.NSwag" Version="1.0.0-alpha.*"/>
+    <PackageReference Include="Weikio.ApiFramework.SDK" Version="1.0.0-alpha.*"/>
   </ItemGroup>
 
   <ItemGroup>
     <None Include="../../docs/logo_256.png" Pack="true" Visible="false" PackagePath="" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\ApiFramework\src\Weikio.ApiFramework.AspNetCore.NSwag\Weikio.ApiFramework.AspNetCore.NSwag.csproj" />
-    <ProjectReference Include="..\..\..\ApiFramework\src\Weikio.ApiFramework.SDK\Weikio.ApiFramework.SDK.csproj" />
-  </ItemGroup>
-  
 </Project>
