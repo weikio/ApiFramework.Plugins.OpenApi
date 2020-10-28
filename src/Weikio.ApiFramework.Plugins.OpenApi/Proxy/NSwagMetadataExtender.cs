@@ -8,7 +8,7 @@ using Weikio.ApiFramework.AspNetCore.NSwag;
 
 namespace Weikio.ApiFramework.Plugins.OpenApi.Proxy
 {
-    public class NSwagMetadataExtender : IEndpointMetadataExtender
+    public class NSwagMetadataExtender
     {
         private readonly IEndpointRouteTemplateProvider _endpointRouteTemplateProvider;
 
@@ -17,9 +17,8 @@ namespace Weikio.ApiFramework.Plugins.OpenApi.Proxy
             _endpointRouteTemplateProvider = endpointRouteTemplateProvider;
         }
 
-        public virtual async Task<List<object>> GetMetadata(Endpoint endpoint)
+        public virtual async Task<List<object>> GetMetadata(Endpoint endpoint, ApiOptions config)
         {
-            var config = (ApiOptions) endpoint.Configuration;
             var openApiDocument = await OpenApiDocument.FromUrlAsync(config.SpecificationUrl);
 
             var additionalOperationPaths = new Dictionary<string, OpenApiPathItem>();

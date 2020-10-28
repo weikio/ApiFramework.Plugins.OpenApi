@@ -53,7 +53,7 @@ namespace Weikio.ApiFramework.Plugins.OpenApi.Proxy
         {
             var nswagExtender = new NSwagMetadataExtender(_endpointRouteTemplateProvider);
 
-            return await nswagExtender.GetMetadata(endpoint);
+            return await nswagExtender.GetMetadata(endpoint, (ApiOptions) endpoint.Configuration);
         }
     }
 }
