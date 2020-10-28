@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
-
-namespace Weikio.ApiFramework.Plugins.OpenApi
+﻿namespace Weikio.ApiFramework.Plugins.OpenApi.Proxy
 {
     public class ServerUrl
     {

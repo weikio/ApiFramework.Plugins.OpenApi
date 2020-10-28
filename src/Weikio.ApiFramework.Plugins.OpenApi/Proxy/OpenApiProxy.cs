@@ -5,49 +5,34 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
 using Microsoft.ReverseProxy.Service.Proxy;
 using Microsoft.ReverseProxy.Service.RuntimeModel.Transforms;
-using NJsonSchema;
-using NSwag;
-using Weikio.ApiFramework.Abstractions;
-using Weikio.ApiFramework.AspNetCore.NSwag;
-using Weikio.ApiFramework.SDK;
-using Endpoint = Weikio.ApiFramework.Abstractions.Endpoint;
 
-namespace Weikio.ApiFramework.Plugins.OpenApi
+namespace Weikio.ApiFramework.Plugins.OpenApi.Proxy
 {
-    public class OpenApiClientProxy : IEndpointMetadataExtender
+    public class OpenApiProxy
     {
-        private readonly ILogger<OpenApiClientProxy> _logger;
+        private readonly ILogger<OpenApiProxy> _logger;
         private readonly ILoggerFactory _loggerFactory;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IServiceProvider _serviceProvider;
-        private readonly IEndpointRouteTemplateProvider _endpointRouteTemplateProvider;
 
         public ApiOptions Configuration { get; set; }
 
-        public OpenApiClientProxy(ILogger<OpenApiClientProxy> logger, ILoggerFactory loggerFactory, IHttpContextAccessor httpContextAccessor,
-            IServiceProvider serviceProvider, IEndpointRouteTemplateProvider endpointRouteTemplateProvider)
+        public OpenApiProxy(ILogger<OpenApiProxy> logger, ILoggerFactory loggerFactory, IHttpContextAccessor httpContextAccessor,
+            IServiceProvider serviceProvider, ApiOptions configuration)
         {
             _logger = logger;
             _loggerFactory = loggerFactory;
             _httpContextAccessor = httpContextAccessor;
             _serviceProvider = serviceProvider;
-            _endpointRouteTemplateProvider = endpointRouteTemplateProvider;
+            Configuration = configuration;
         }
-
-        [FixedHttpConventions]
-        [ApiExplorerSettings(IgnoreApi = true)]
-        [Route("{**catchAll}")]
-        [HttpGet]
-        [HttpPost]
-        [HttpPut]
-        [HttpDelete]
-        public async Task Run(string catchAll)
+        
+        public async Task RunRequest(string catchAll)
         {
             var proxy = GetProxy();
             var client = GetClient();
@@ -111,14 +96,14 @@ namespace Weikio.ApiFramework.Plugins.OpenApi
 
             await proxy.ProxyAsync(context, endpointUrl, client, proxyOptions);
         }
-
+        
         private static string _proxyLock = "lock";
         private static IHttpProxy _proxy = null;
 
         private static string _clientLock = "lock";
         private static HttpMessageInvoker _client = null;
-
-        private IHttpProxy GetProxy()
+        
+        protected virtual IHttpProxy GetProxy()
         {
             if (_proxy != null)
             {
@@ -144,7 +129,7 @@ namespace Weikio.ApiFramework.Plugins.OpenApi
             }
         }
 
-        private HttpMessageInvoker GetClient()
+        protected virtual HttpMessageInvoker GetClient()
         {
             if (_client != null)
             {
@@ -163,86 +148,6 @@ namespace Weikio.ApiFramework.Plugins.OpenApi
 
                 return _client;
             }
-        }
-
-        [ApiExplorerSettings(IgnoreApi = true)]
-        [FixedHttpConventions]
-        public async Task<List<object>> GetMetadata(Endpoint endpoint)
-        {
-            var config = (ApiOptions) endpoint.Configuration;
-            var openApiDocument = await OpenApiDocument.FromUrlAsync(config.SpecificationUrl);
-
-            var additionalOperationPaths = new Dictionary<string, OpenApiPathItem>();
-            var additionalSchemas = new List<KeyValuePair<string, JsonSchema>>();
-
-            var routeTemplate = _endpointRouteTemplateProvider.GetRouteTemplate(endpoint);
-
-            var transformedPaths = new Dictionary<string, OpenApiPathItem>();
-
-            foreach (var path in openApiDocument.Paths)
-            {
-                var transformedPath = config.TransformPath(path.Key, path.Value, config);
-                transformedPaths.Add(transformedPath.Item1, transformedPath.Item2);
-            }
-
-            foreach (var path in transformedPaths)
-            {
-                var isIncluded = config.IncludePath(path.Key, path.Value, config);
-
-                if (!isIncluded)
-                {
-                    continue;
-                }
-
-                var isExcluded = config.ExcludePath(path.Key, path.Value, config);
-
-                if (isExcluded)
-                {
-                    continue;
-                }
-
-                var includedOperations = new Dictionary<string, OpenApiOperation>();
-
-                foreach (var operationId in path.Value.Keys)
-                {
-                    var operation = path.Value[operationId];
-
-                    var isOperationIncluded = config.IncludeOperation(operationId, operation, config);
-
-                    if (!isOperationIncluded)
-                    {
-                        continue;
-                    }
-
-                    var isOperationExcluded = config.ExcludeOperation(operationId, operation, config);
-
-                    if (isOperationExcluded)
-                    {
-                        continue;
-                    }
-
-                    var transformedOperation = config.TransformOperation(operationId, operation, config);
-
-                    includedOperations.Add(transformedOperation.Item1, transformedOperation.Item2);
-                }
-
-                path.Value.Clear();
-                path.Value.AddRange(includedOperations);
-
-                additionalOperationPaths.Add(routeTemplate + path.Key, path.Value);
-            }
-
-            // TODO: These could be filtered based on the operation/path filterings
-            foreach (var openApiSchema in openApiDocument.Components.Schemas)
-            {
-                additionalSchemas.Add(openApiSchema);
-            }
-
-            var defaultUrl = openApiDocument.Servers?.FirstOrDefault()?.Url ?? string.Empty;
-
-            var openApiDocumentExtensions = new OpenApiDocumentExtensions(additionalOperationPaths, additionalSchemas);
-
-            return new List<object> { openApiDocumentExtensions, new ServerUrl(defaultUrl) };
         }
     }
 }

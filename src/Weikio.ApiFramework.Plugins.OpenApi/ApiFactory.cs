@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using LamarCompiler;
 using NSwag;
 using NSwag.CodeGeneration.CSharp;
+using Weikio.ApiFramework.Plugins.OpenApi.Proxy;
 
 namespace Weikio.ApiFramework.Plugins.OpenApi
 {
