@@ -29,22 +29,30 @@ namespace Weikio.ApiFramework.Plugins.OpenApi.Proxy
             _loggerFactory = loggerFactory;
             _httpContextAccessor = httpContextAccessor;
             _serviceProvider = serviceProvider;
+            
             Configuration = configuration;
         }
         
-        public async Task RunRequest(string catchAll)
+        public async Task RunRequest(string catchAll, ApiOptions overrideOptions = null)
         {
             var proxy = GetProxy();
             var client = GetClient();
             var context = _httpContextAccessor.HttpContext;
 
-            var requestContext = new ApiRequestContext(Configuration, _serviceProvider, this, proxy, client, context);
+            var config = Configuration;
+
+            if (overrideOptions != null)
+            {
+                config = overrideOptions;
+            }
+            
+            var requestContext = new ApiRequestContext(config, _serviceProvider, this, proxy, client, context);
 
             object state = null;
 
-            if (Configuration?.BeforeRequest != null)
+            if (config?.BeforeRequest != null)
             {
-                state = await Configuration.BeforeRequest(requestContext);
+                state = await config.BeforeRequest(requestContext);
             }
 
             var route = context.Request.Path.ToString().Replace(catchAll, "").TrimEnd('/');
@@ -58,16 +66,16 @@ namespace Weikio.ApiFramework.Plugins.OpenApi.Proxy
                 endpointUrl = serverUrlMetaData.Url;
             }
 
-            if (!string.IsNullOrWhiteSpace(Configuration?.ApiUrl))
+            if (!string.IsNullOrWhiteSpace(config?.ApiUrl))
             {
-                endpointUrl = Configuration.ApiUrl;
+                endpointUrl = config.ApiUrl;
             }
 
             var additionalHeaders = new Dictionary<string, string>();
 
-            if (Configuration?.ConfigureAdditionalHeaders != null)
+            if (config?.ConfigureAdditionalHeaders != null)
             {
-                additionalHeaders = Configuration.ConfigureAdditionalHeaders(requestContext, state);
+                additionalHeaders = config.ConfigureAdditionalHeaders(requestContext, state);
             }
 
             var headerTransforms = new Dictionary<string, RequestHeaderTransform>()
@@ -87,7 +95,7 @@ namespace Weikio.ApiFramework.Plugins.OpenApi.Proxy
                     copyRequestHeaders: true,
                     requestTransforms: new List<RequestParametersTransform>()
                     {
-                        new PathStringTransform(PathStringTransform.PathTransformMode.RemovePrefix, new PathString(route))
+                        new PathStringTransform(PathStringTransform.PathTransformMode.RemovePrefix, new PathString(route)),
                     },
                     requestHeaderTransforms: headerTransforms,
                     responseHeaderTransforms: new Dictionary<string, ResponseHeaderTransform>(),
