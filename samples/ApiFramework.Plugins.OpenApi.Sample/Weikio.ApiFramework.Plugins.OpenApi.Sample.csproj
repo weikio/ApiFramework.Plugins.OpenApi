@@ -14,8 +14,4 @@
     <ProjectReference Include="..\..\src\Weikio.ApiFramework.Plugins.OpenApi\Weikio.ApiFramework.Plugins.OpenApi.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <_ContentIncludedByDefault Remove="Pages\Endpoints.cshtml" />
-  </ItemGroup>
-
 </Project>
