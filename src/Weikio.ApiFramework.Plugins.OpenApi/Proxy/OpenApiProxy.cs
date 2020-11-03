@@ -88,15 +88,22 @@ namespace Weikio.ApiFramework.Plugins.OpenApi.Proxy
                 headerTransforms.Add(additionalHeader.Key, new RequestHeaderValueTransform(additionalHeader.Value, true));
             }
 
+            var requestParameterTransforms = new List<RequestParametersTransform>()
+            {
+                new PathStringTransform(PathStringTransform.PathTransformMode.RemovePrefix, new PathString(route)),
+            };
+            
+            if (config?.ConfigureRequestParameterTransforms != null)
+            {
+                requestParameterTransforms = config.ConfigureRequestParameterTransforms(requestContext, state, requestParameterTransforms);
+            }
+            
             var proxyOptions = new RequestProxyOptions()
             {
                 RequestTimeout = TimeSpan.FromSeconds(100),
                 Transforms = new Transforms(
                     copyRequestHeaders: true,
-                    requestTransforms: new List<RequestParametersTransform>()
-                    {
-                        new PathStringTransform(PathStringTransform.PathTransformMode.RemovePrefix, new PathString(route)),
-                    },
+                    requestTransforms: requestParameterTransforms,
                     requestHeaderTransforms: headerTransforms,
                     responseHeaderTransforms: new Dictionary<string, ResponseHeaderTransform>(),
                     responseTrailerTransforms: new Dictionary<string, ResponseHeaderTransform>())
