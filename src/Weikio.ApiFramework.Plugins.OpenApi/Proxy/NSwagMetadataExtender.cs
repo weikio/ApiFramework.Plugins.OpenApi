@@ -71,11 +71,15 @@ namespace Weikio.ApiFramework.Plugins.OpenApi.Proxy
                     }
 
                     var transformedOperation = config.TransformOperation(operationId, operation, config);
+                    var transformedTags = config.TransformTags(endpoint, operation, config, operation.Tags);
+                    
+                    transformedOperation.Item2.Tags = transformedTags;
 
                     includedOperations.Add(transformedOperation.Item1, transformedOperation.Item2);
                 }
 
                 path.Value.Clear();
+                
                 path.Value.AddRange(includedOperations);
 
                 additionalOperationPaths.Add(routeTemplate + path.Key, path.Value);

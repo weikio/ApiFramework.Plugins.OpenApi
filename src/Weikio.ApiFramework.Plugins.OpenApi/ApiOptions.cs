@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.ReverseProxy.Service.RuntimeModel.Transforms;
 using NSwag;
+using Weikio.ApiFramework.Abstractions;
 using Weikio.ApiFramework.Plugins.OpenApi.Proxy;
 
 namespace Weikio.ApiFramework.Plugins.OpenApi
@@ -20,6 +21,7 @@ namespace Weikio.ApiFramework.Plugins.OpenApi
         public string ApiUrl { get; set; }
 
         public ApiMode Mode { get; set; } = ApiMode.Client;
+        public TagTransformModeEnum TagTransformMode { get; set; } = TagTransformModeEnum.UseOriginal;
 
         public AuthenticationOptions Authentication { get; set; }
 
@@ -37,5 +39,27 @@ namespace Weikio.ApiFramework.Plugins.OpenApi
         public Func<string, OpenApiOperation, ApiOptions, bool> ExcludeOperation { get; set; } = (operationId, item, options) => false;
         public Func<string, OpenApiPathItem, ApiOptions, (string, OpenApiPathItem)> TransformPath { get; set; } = (path, item, options) => (path, item);
         public Func<string, OpenApiOperation, ApiOptions, (string, OpenApiOperation)> TransformOperation { get; set; } = (path, item, options) => (path, item);
+        public Func<Endpoint, OpenApiOperation, ApiOptions, List<string>, List<string>> TransformTags { get; set; } =
+            (endpoint, operation, options, originalTags) =>
+            {
+                if (options.TagTransformMode == TagTransformModeEnum.UseOriginal)
+                {
+                    return originalTags;
+                }
+                
+                if (options.TagTransformMode == TagTransformModeEnum.UseEndpointNameOrRoute)
+                {
+                    return new List<string>() { string.IsNullOrWhiteSpace(endpoint.Name) ? endpoint.Route : endpoint.Name };
+                }
+
+                if (originalTags == null)
+                {
+                    originalTags = new List<string>();
+                }
+                
+                originalTags.Add(string.IsNullOrWhiteSpace(endpoint.Name) ? endpoint.Route : endpoint.Name);
+
+                return originalTags;
+            };
     }
 }
