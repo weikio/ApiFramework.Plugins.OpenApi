@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Weikio.ApiFramework.Abstractions;
 using Weikio.ApiFramework.SDK;
 using Endpoint = Weikio.ApiFramework.Abstractions.Endpoint;
@@ -52,8 +53,21 @@ namespace Weikio.ApiFramework.Plugins.OpenApi.Proxy
         public async Task<List<object>> GetMetadata(Endpoint endpoint)
         {
             var nswagExtender = new NSwagMetadataExtender(_endpointRouteTemplateProvider);
+            var endpointConfiguration = GetConfiguration(endpoint);
 
-            return await nswagExtender.GetMetadata(endpoint, (ApiOptions) endpoint.Configuration);
+            return await nswagExtender.GetMetadata(endpoint, endpointConfiguration);
+        }
+        
+        private ApiOptions GetConfiguration(Endpoint endpoint)
+        {
+            if (endpoint.Configuration is ApiOptions options)
+            {
+                return options;
+            }
+
+            var result = JsonConvert.DeserializeObject<ApiOptions>(JsonConvert.SerializeObject(endpoint.Configuration));
+
+            return result;
         }
     }
 }
