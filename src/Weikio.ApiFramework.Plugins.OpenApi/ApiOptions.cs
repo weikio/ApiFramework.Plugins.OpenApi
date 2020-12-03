@@ -20,8 +20,8 @@ namespace Weikio.ApiFramework.Plugins.OpenApi
         /// </summary>
         public string ApiUrl { get; set; }
 
-        public ApiMode Mode { get; set; } = ApiMode.Client;
-        public TagTransformModeEnum TagTransformMode { get; set; } = TagTransformModeEnum.UseOriginal;
+        public ApiMode Mode { get; set; } = ApiMode.Proxy;
+        public TagTransformModeEnum TagTransformMode { get; set; } = TagTransformModeEnum.UseEndpointNameOrRoute;
 
         public AuthenticationOptions Authentication { get; set; }
 
