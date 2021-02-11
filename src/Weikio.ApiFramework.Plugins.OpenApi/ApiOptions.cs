@@ -34,6 +34,8 @@ namespace Weikio.ApiFramework.Plugins.OpenApi
         public Func<ApiRequestContext, object, List<RequestParametersTransform>, List<RequestParametersTransform>> ConfigureRequestParameterTransforms =
             (context, state, defaultTransforms) => defaultTransforms;
 
+        public bool RemoveCookieHeader { get; set; } = false;
+
         public Func<string, OpenApiPathItem, ApiOptions, bool> IncludePath { get; set; } = (path, item, options) => true;
         public Func<string, OpenApiPathItem, ApiOptions, bool> ExcludePath { get; set; } = (path, item, options) => false;
         public Func<string, OpenApiOperation, ApiOptions, bool> IncludeOperation { get; set; } = (operationId, item, options) => true;

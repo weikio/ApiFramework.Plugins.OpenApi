@@ -29,10 +29,10 @@ namespace Weikio.ApiFramework.Plugins.OpenApi.Proxy
             _loggerFactory = loggerFactory;
             _httpContextAccessor = httpContextAccessor;
             _serviceProvider = serviceProvider;
-            
+
             Configuration = configuration;
         }
-        
+
         public async Task RunRequest(string catchAll, ApiOptions overrideOptions = null)
         {
             var proxy = GetProxy();
@@ -45,7 +45,7 @@ namespace Weikio.ApiFramework.Plugins.OpenApi.Proxy
             {
                 config = overrideOptions;
             }
-            
+
             var requestContext = new ApiRequestContext(config, _serviceProvider, this, proxy, client, context);
 
             object state = null;
@@ -80,8 +80,13 @@ namespace Weikio.ApiFramework.Plugins.OpenApi.Proxy
 
             var headerTransforms = new Dictionary<string, RequestHeaderTransform>()
             {
-                { HeaderNames.Host, new RequestHeaderValueTransform(string.Empty, append: false) }
+                { HeaderNames.Host, new RequestHeaderValueTransform(string.Empty, append: false) },
             };
+
+            if (config?.RemoveCookieHeader == true)
+            {
+                headerTransforms.Add(HeaderNames.Cookie, new RequestHeaderValueTransform(string.Empty, false));
+            }
 
             foreach (var additionalHeader in additionalHeaders)
             {
@@ -92,12 +97,12 @@ namespace Weikio.ApiFramework.Plugins.OpenApi.Proxy
             {
                 new PathStringTransform(PathStringTransform.PathTransformMode.RemovePrefix, new PathString(route)),
             };
-            
+
             if (config?.ConfigureRequestParameterTransforms != null)
             {
                 requestParameterTransforms = config.ConfigureRequestParameterTransforms(requestContext, state, requestParameterTransforms);
             }
-            
+
             var proxyOptions = new RequestProxyOptions()
             {
                 RequestTimeout = TimeSpan.FromSeconds(100),
@@ -111,13 +116,13 @@ namespace Weikio.ApiFramework.Plugins.OpenApi.Proxy
 
             await proxy.ProxyAsync(context, endpointUrl, client, proxyOptions);
         }
-        
+
         private static string _proxyLock = "lock";
         private static IHttpProxy _proxy = null;
 
         private static string _clientLock = "lock";
         private static HttpMessageInvoker _client = null;
-        
+
         protected virtual IHttpProxy GetProxy()
         {
             if (_proxy != null)
