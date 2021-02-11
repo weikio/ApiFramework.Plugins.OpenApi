@@ -38,6 +38,7 @@
     <PackageReference Include="NSwag.CodeGeneration.CSharp" Version="13.8.2" />
     <PackageReference Include="Weikio.ApiFramework.AspNetCore.NSwag" Version="1.0.0-alpha.*" />
     <PackageReference Include="Weikio.ApiFramework.SDK" Version="1.0.0-alpha.*" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="3.6.0" />
   </ItemGroup>
 
   <ItemGroup>

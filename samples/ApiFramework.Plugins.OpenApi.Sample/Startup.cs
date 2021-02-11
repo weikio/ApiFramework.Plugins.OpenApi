@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -25,10 +26,19 @@ namespace Weikio.ApiFramework.Plugins.OpenApi.Sample
             services.AddRazorPages();
 
             services.AddApiFramework()
-                .AddOpenApi("/petstore", new ApiOptions() { Mode = ApiMode.Proxy, SpecificationUrl = "https://petstore.swagger.io/v2/swagger.json" });
+                .AddOpenApi("/petstore",
+                    new ApiOptions()
+                    {
+                        Mode = ApiMode.Proxy,
+                        SpecificationUrl = "https://petstore.swagger.io/v2/swagger.json",
+                        AdditionalHeaders = new Dictionary<string, string>()
+                        {
+                            { "test", "header" }
+                        }
+                    });
 
             services.AddTransient<IDocumentProcessor, OpenApiExtenderDocumentProcessor>();
-            
+
             services.AddOpenApiDocument();
         }
 
@@ -46,7 +56,7 @@ namespace Weikio.ApiFramework.Plugins.OpenApi.Sample
 
             app.UseOpenApi();
             app.UseSwaggerUi3();
-            
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

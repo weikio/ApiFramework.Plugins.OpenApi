@@ -24,11 +24,12 @@ namespace Weikio.ApiFramework.Plugins.OpenApi
         public TagTransformModeEnum TagTransformMode { get; set; } = TagTransformModeEnum.UseEndpointNameOrRoute;
 
         public AuthenticationOptions Authentication { get; set; }
-
+        public Dictionary<string, string> AdditionalHeaders { get; set; } = new Dictionary<string, string>();
         public HttpClientOptions HttpClient { get; set; } = new HttpClientOptions();
 
         public Func<ApiRequestContext, Task<object>> BeforeRequest = null;
-        public Func<ApiRequestContext, object, Dictionary<string, string>> ConfigureAdditionalHeaders = null;
+
+        public Func<ApiRequestContext, object, Dictionary<string, string>> ConfigureAdditionalHeaders = (context, o) => context.Options.AdditionalHeaders;
 
         public Func<ApiRequestContext, object, List<RequestParametersTransform>, List<RequestParametersTransform>> ConfigureRequestParameterTransforms =
             (context, state, defaultTransforms) => defaultTransforms;
@@ -39,6 +40,7 @@ namespace Weikio.ApiFramework.Plugins.OpenApi
         public Func<string, OpenApiOperation, ApiOptions, bool> ExcludeOperation { get; set; } = (operationId, item, options) => false;
         public Func<string, OpenApiPathItem, ApiOptions, (string, OpenApiPathItem)> TransformPath { get; set; } = (path, item, options) => (path, item);
         public Func<string, OpenApiOperation, ApiOptions, (string, OpenApiOperation)> TransformOperation { get; set; } = (path, item, options) => (path, item);
+
         public Func<Endpoint, OpenApiOperation, ApiOptions, List<string>, List<string>> TransformTags { get; set; } =
             (endpoint, operation, options, originalTags) =>
             {
@@ -46,7 +48,7 @@ namespace Weikio.ApiFramework.Plugins.OpenApi
                 {
                     return originalTags;
                 }
-                
+
                 if (options.TagTransformMode == TagTransformModeEnum.UseEndpointNameOrRoute)
                 {
                     return new List<string>() { string.IsNullOrWhiteSpace(endpoint.Name) ? endpoint.Route : endpoint.Name };
@@ -56,7 +58,7 @@ namespace Weikio.ApiFramework.Plugins.OpenApi
                 {
                     originalTags = new List<string>();
                 }
-                
+
                 originalTags.Add(string.IsNullOrWhiteSpace(endpoint.Name) ? endpoint.Route : endpoint.Name);
 
                 return originalTags;

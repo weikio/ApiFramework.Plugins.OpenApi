@@ -8,6 +8,7 @@
     <PackageReference Include="Weikio.ApiFramework.AspNetCore" Version="1.0.0-alpha.*" />
     <PackageReference Include="Weikio.ApiFramework.AspNetCore.NSwag" Version="1.0.0-alpha.*" />
     <PackageReference Include="NSwag.AspNetCore" Version="13.8.2" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="3.6.0" />
   </ItemGroup>
 
   <ItemGroup>
