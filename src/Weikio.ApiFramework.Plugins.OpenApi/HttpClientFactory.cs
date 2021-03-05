@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -42,12 +42,12 @@ namespace Weikio.ApiFramework.Plugins.OpenApi
                 return;
             }
 
-            if (!string.IsNullOrEmpty(apiOptions.Authentication.Bearer))
+            if (!string.IsNullOrEmpty(apiOptions.Authentication.Basic))
             {
                 var base64Credentials = Convert.ToBase64String(Encoding.UTF8.GetBytes(apiOptions.Authentication.Basic));
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", base64Credentials);
             }
-            else if (!string.IsNullOrEmpty(apiOptions.Authentication.Basic))
+            else if (!string.IsNullOrEmpty(apiOptions.Authentication.Bearer))
             {
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiOptions.Authentication.Bearer);
             }
