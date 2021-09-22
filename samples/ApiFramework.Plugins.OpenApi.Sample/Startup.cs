@@ -26,11 +26,8 @@ namespace Weikio.ApiFramework.Plugins.OpenApi.Sample
                 .AddOpenApi("/petstore",
                     new ApiOptions()
                     {
-                        SpecificationUrl = "https://petstore.swagger.io/v2/swagger.json",
-                        AdditionalHeaders = new Dictionary<string, string>()
-                        {
-                            { "test", "header" }
-                        }
+                        SpecificationUrl = "https://petstore3.swagger.io/api/v3/openapi.json",
+                        ApiUrl = "https://petstore3.swagger.io/api/v3"
                     });
         }
 
