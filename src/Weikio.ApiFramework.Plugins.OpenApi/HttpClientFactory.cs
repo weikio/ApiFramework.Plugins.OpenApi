@@ -24,9 +24,9 @@ namespace Weikio.ApiFramework.Plugins.OpenApi
 
                 var client = new HttpClient();
 
-                if (TimeSpan.TryParse(options.HttpClient?.Timeout, out var timeout))
+                if (options.HttpClient?.Timeout.HasValue == true)
                 {
-                    client.Timeout = timeout;
+                    client.Timeout = options.HttpClient.Timeout.Value;
                 }
 
                 ConfigureAuthentication(client, options);
