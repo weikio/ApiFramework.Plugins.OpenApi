@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -111,7 +111,7 @@ namespace Weikio.ApiFramework.Plugins.OpenApi.Proxy
 
             var proxyOptions = new RequestProxyOptions()
             {
-                RequestTimeout = TimeSpan.FromSeconds(100),
+                RequestTimeout = Configuration.HttpClient?.Timeout ?? TimeSpan.FromSeconds(100),
                 Transforms = new Transforms(
                     copyRequestHeaders: true,
                     requestTransforms: requestParameterTransforms,
