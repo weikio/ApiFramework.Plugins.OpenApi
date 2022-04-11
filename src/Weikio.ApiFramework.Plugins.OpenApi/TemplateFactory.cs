@@ -50,19 +50,6 @@ namespace Weikio.ApiFramework.Plugins.OpenApi
                 case CSharpOperationModel operationModel:
                     // at some point in the future, NSwag will provide a direct access to CSharpOperationModel
                     return operationModel;
-
-                case DotLiquid.Hash modelValues:
-                    // currently, model object contains LiquidProxyHash object which inherits from DotLiquid.Hash
-                    // and there should be entry for "operation" key.
-
-                    if (modelValues.TryGetValue("operation", out var operation))
-                    {
-                        // operation is again a LiquidProxyHash object, which is internal and because of that,
-                        // we have to access Object property using reflection.
-                        var objectProperty = operation.GetType().GetProperty("Object");
-                        return objectProperty?.GetValue(operation) as CSharpOperationModel;
-                    }
-                    break;
             }
 
             return null;

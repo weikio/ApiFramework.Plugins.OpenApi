@@ -27,7 +27,6 @@ namespace Weikio.ApiFramework.Plugins.OpenApi.Sample
                     new ApiOptions()
                     {
                         SpecificationUrl = "https://petstore3.swagger.io/api/v3/openapi.json",
-                        ApiUrl = "https://petstore3.swagger.io/api/v3"
                     });
         }
 

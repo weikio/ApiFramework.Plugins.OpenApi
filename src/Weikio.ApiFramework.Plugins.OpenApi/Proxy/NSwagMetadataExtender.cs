@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using NJsonSchema;
@@ -93,6 +94,19 @@ namespace Weikio.ApiFramework.Plugins.OpenApi.Proxy
             }
 
             var defaultUrl = openApiDocument.Servers?.FirstOrDefault()?.Url ?? string.Empty;
+
+            if (!string.IsNullOrWhiteSpace(defaultUrl))
+            {
+                if (Uri.IsWellFormedUriString(defaultUrl, UriKind.Relative))
+                {
+                    // Relative url. Assume that the host is the same as the specification url's host
+
+                    var specUri = new Uri(config.SpecificationUrl);
+                    var baseAddress = specUri.GetLeftPart(UriPartial.Authority);
+
+                    defaultUrl = baseAddress.TrimEnd('/') + "/" + defaultUrl.TrimStart('/');
+                }
+            }
 
             var openApiDocumentExtensions = new OpenApiDocumentExtensions(additionalOperationPaths, additionalSchemas);
 
