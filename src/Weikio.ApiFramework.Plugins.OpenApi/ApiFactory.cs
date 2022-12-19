@@ -32,9 +32,6 @@ namespace Weikio.ApiFramework.Plugins.OpenApi
                 CSharpGeneratorSettings = { Namespace = GetNamespace(endpointRoute) }
             };
 
-            var defaultTemplateFactory = clientGeneratorSettings.CSharpGeneratorSettings.TemplateFactory;
-            clientGeneratorSettings.CSharpGeneratorSettings.TemplateFactory = new TemplateFactory(defaultTemplateFactory);
-
             var clientGenerator = new CSharpClientGenerator(openApiDocument, clientGeneratorSettings);
             var clientCode = clientGenerator.GenerateFile();
 
